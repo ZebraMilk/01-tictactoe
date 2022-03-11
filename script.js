@@ -5,7 +5,7 @@ const Player = (name, token) => {
 // This is the internal gameBoard, 
 const gameBoard = (() => {
   // TODO initialize an arry in here that is private
-  const board = [null, null, null, null, null, null, null, null, null];
+  const boardArray = [null, null, null, null, null, null, null, null, null];
 
 
 
@@ -14,7 +14,7 @@ const gameBoard = (() => {
 
   return {
     // TODO return an object with the public stuff I want to expose
-    board: board
+    board: boardArray
   };
 
 })();
@@ -47,8 +47,19 @@ const userOptions = ((doc) => {
 // This grabs DOM elements and does stuff to them
 const displayController = ((doc) => {
 
+
   // grid stuff
   const board = doc.querySelector(".game-board");
+  board.addEventListener("click", (e) => {
+    e.stopPropagation();
+    gameBoard.board[parseInt(e.target.id)] = 12;
+  })
+
+
+
+
+
+
   const clearGrid = () => {
     while (board.lastElementChild) {
       board.removeChild(board.lastElementChild);
