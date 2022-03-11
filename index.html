@@ -16,8 +16,51 @@
   </head>
 
   <body>
-    <h1>tictactoe</h1>
+    <div class="main-content">
+      <header>
+        <h1>tictactoe</h1>
+      
+      </header>
+      <div class="game-container">
+        <div class="game-menu">
+          <div class="options">
+            <label for="token">Player Choice</label>
+            <select name="token" id="player-token-choice">
+              <option value="X" class="x-token">X</option>
+              <option value="O" class="o-token">O</option>
+            </select>
+          </div>
+        </div>
+        <div class="game-content">
+          <div class="game-board">
+      
+          </div>
+          <div class="turn-display">
+            <h2>
+              Your Turn, loser!
+            </h2>
+          </div>
+          <div class="scoreboard">
+            <table>
+              <th>
+                Player
+              </th>
+              <tr>
+                0
+              </tr>
+              <th>
+                Opponent
+              </th>
+              <tr>
+                0
+              </tr>
 
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
   </body>
 
 </html>
