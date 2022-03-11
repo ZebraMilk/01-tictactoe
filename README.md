@@ -15,3 +15,22 @@
 
 ***
 
+## Fun functionality
+- Have a popup after the player goes first asking if they want to continue, arrogantly asserting it cannot lose
+
+
+# Project outline
+
+
+modules:
+- gameBoard
+  - render
+
+
+
+functions:
+- checkForWinner
+- computerMove
+- playerMove
+- calculateMove
+- 
