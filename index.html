@@ -26,11 +26,29 @@
           <fieldset>
             <legend>Game Options</legend>
             <div class="options">
+              <label for="player1-name">
+                Player 1 Name:
+                <input type="text" name="player1-name" id="player1-name">
+              </label>
               <label for="token">Player Choice</label>
               <select name="token" id="player-token-choice">
                 <option value="X" class="X">X</option>
                 <option value="O" class="O">O</option>
               </select>
+              <div class="opponent-type">
+  
+                <fieldset>
+                  <legend>Opponent Type</legend>
+                  <label for="human">
+                    Human
+                    <input type="radio" name="opponent" id="human" class="human" checked>
+                  </label>
+                  <label for="computer">
+                    Computer
+                    <input type="radio" name="opponent" id="computer" class="computer">
+                  </label>
+                </fieldset>
+              </div>
             </div>
           </fieldset>
           <div class="buttons">

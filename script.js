@@ -1,5 +1,5 @@
 const playerFactory = (name, token) => {
-  // TODO return a player object with some methods on it like .place or .score
+
   const playerName = name;
   const playerToken = token;
   // This stores the id values of the places on the board where this player has moved
@@ -12,57 +12,57 @@ const playerFactory = (name, token) => {
   // Do I need any functions here? What do I want the player to be able to do?
 };
 
+const grabDOM = ((doc) => {
+  "use strict"
+  // Isolate all the DOM grabbing (except input fields)
+  const board = doc.querySelector(".game-board");
+  const newGameBtn = doc.querySelector(".new-game");
+// Grabs the user option fields and stores those valuables as variables
+  const playerTokenChoice = doc.getElementById("player-token-choice");
+  const player1Name = doc.getElementById("player1-name");
+
+  return {
+    board,
+    newGameBtn,
+    playerTokenChoice,
+    player1Name
+
+  };
+
+})(document);
+
 
 // This is the internal gameBoard, 
 const gameBoard = (() => {
   "use strict";
-  // TODO initialize an arry in here that is private
-  const _boardArray = [null, null, null, null, null, null, null, null, null]
+  // Private array
+  let _boardArray = [null, null, null, null, null, null, null, null, null];
 
   const resetBoardArray = () => {
-    // _boardArray.forEach((value) => {
-    //   value = "null";
-    // })
-    _boardArray = [null, null, null, null, null, null, null, null, null]
+    _boardArray = [null, null, null, null, null, null, null, null, null];
   };
 
   const updateBoard = (index, value) => (_boardArray[index] = value);
+  // checks the board array to see if the square is occupied, returns boolean
+  const isOccupied = (index) => _boardArray[index] ? true : false;
+
   const logBoard = () => console.log(_boardArray);
 
   return {
-    // TODO return an object with the public stuff I want to expose
     resetBoardArray,
     updateBoard,
+    isOccupied,
     logBoard
   };
 
 })();
 
-// Grabs the user option fields and stores those valuables as variables
-// Goal is to pass playerToken into another module for easier use
-const userOptions = ((doc) => {
-  "use strict";
-  const playerTokenChoice = doc.getElementById("player-token-choice");
-
-
-
-  return {
-    playerTokenChoice
-  };
-})(document);
 
 // This grabs game DOM elements and does stuff to them
 const displayController = ((doc) => {
   "use strict";
   // grid stuff
-  const board = doc.querySelector(".game-board");
-  board.addEventListener("click", (e) => {
-    e.stopPropagation();
-    gameBoard.updateBoard(e.target.id, userOptions.playerTokenChoice.value);
-    e.target.innerText = userOptions.playerTokenChoice.value;
-  });
-
-
+  const board = grabDOM.board;
 
   const _clearGrid = () => {
     while (board.lastElementChild) {
@@ -82,61 +82,104 @@ const displayController = ((doc) => {
   const newGrid = () => {
     _clearGrid();
     _makeGrid();
-    gameBoard.resetBoardArray;
+    gameBoard.resetBoardArray();
   };
-
-  const newGameBtn = doc.querySelector(".new-game");
-  newGameBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    newGrid();
-  });
-
-  // event listeners?
 
   return {
-    // QUESTION: why do I return the function object and not the function expression, makeGrid() here?
     newGrid
   };
+
 })(document);
 
-const computerAI = (() => {
-  // TODO write a basic AI that picks a random empty suare to move
+// TODO:: maybe put this inside of the gameBoard module so it has access to the private _boardArray?
+const checkState = (() => {
 
-  // TODO write a less basic AI that favors placing tokens adjacent to already occupied squares
-
-  // TODO write a better AI that tries to win, favors getting three in a row
-
-  // TODO write an unbeatable AI
 
   return {
 
   };
 })();
 
+
 const gameFlow = (() => {
-  "use strict"
-  // Here goes things like turn tracking, checking for win/tie
-  let currentTurn;
+  "use strict";
+  // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
+  let playerTurn = true;
+  let activeGame = false;
   // new game
-  const newGame = () => {
-    // Clear the board ans set up a new one
+  const newGame = (() => {
+    const startGame = () => {
+    // Clear the board and set up a new one
     displayController.newGrid();
     // Make player1 with the user choice, player2 with the other choice
-    const player1 = playerFactory(player1, userOptions.playerTokenChoice.value);
-    const player2 = playerFactory(player2, (userOptions.playerTokenChoice.value === "X" ? "O" : "X"));
+    const player1 = playerFactory(`${grabDOM.player1Name}`, `${grabDOM.playerTokenChoice.value}`);
+    const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value === "X" ? "O" : "X"));
+
+    activeGame = true;
     // Return the player whose turn is first
-    currentTurn = (player1.token === "X" ? player1 : player2);
-  };
-  // turn track variable
-  let changeTurn = () => currentTurn === player1 ? player2 : player1;
+    playerTurn = (player1.playerToken === "X" ? true : false);
+    };
+    
+    return {
+      player1,
+      player2
+    };
+  })();
+  // turn change function
+  const changeTurn = () => playerTurn = !playerTurn;
   // check game state for tie/win
 
   return {
-    // TODO expose some stuff
     newGame,
-    changeTurn
+    changeTurn,
+    player1: newGame.player1,
+    player2: newGame.player2,
+    playerTurn,
+    activeGame
   };
 
+
+})();
+
+const computerAI = ((computerPlayer) => {
+  // TODO: write a basic AI that picks a random empty suare to move
+  const computerMove = () => {
+    let random = (Math.floor(Math.random * 10000) % 9);
+    while (gameBoard.isOccupied(random)) {
+      random = (random + 1) % 9;
+    }
+    gameBoard.updateBoard(random, computerPlayer.playerToken);
+  };
+  // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
+
+  // TODO: write a better AI that tries to win, favors getting three in a row
+
+  // TODO: write an unbeatable AI
+
+  return {
+    computerMove
+  };
+})(gameFlow.newGame.player2);
+
+const listenerHandler = (() => {
+  "use strict";
+  // TODO: move all the listeners here.
+
+  grabDOM.newGameBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    gameFlow.newGame();
+  });
+
+  grabDOM.board.addEventListener("click", (e) => {
+    e.stopPropagation();
+    gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken));
+    e.target.innerText = (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken);
+    gameFlow.changeTurn();
+  });
+
+  return {
+
+  };
 
 })();
 
