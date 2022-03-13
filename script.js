@@ -20,6 +20,9 @@ const gameBoard = (() => {
   const _boardArray = [null, null, null, null, null, null, null, null, null]
 
   const resetBoardArray = () => {
+    // _boardArray.forEach((value) => {
+    //   value = "null";
+    // })
     _boardArray = [null, null, null, null, null, null, null, null, null]
   };
 
