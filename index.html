@@ -23,12 +23,19 @@
       </header>
       <div class="game-container">
         <div class="game-menu">
-          <div class="options">
-            <label for="token">Player Choice</label>
-            <select name="token" id="player-token-choice">
-              <option value="X" class="x-token">X</option>
-              <option value="O" class="o-token">O</option>
-            </select>
+          <fieldset>
+            <legend>Game Options</legend>
+            <div class="options">
+              <label for="token">Player Choice</label>
+              <select name="token" id="player-token-choice">
+                <option value="X" class="X">X</option>
+                <option value="O" class="O">O</option>
+              </select>
+            </div>
+          </fieldset>
+          <div class="buttons">
+            <button class="reset">Reset Game</button>
+            <button class="new-game">New Game</button>
           </div>
         </div>
         <div class="game-content">
@@ -37,7 +44,7 @@
           </div>
           <div class="turn-display">
             <h2>
-              Your Turn, loser!
+              Your Turn, lover!
             </h2>
           </div>
           <div class="scoreboard">
@@ -45,14 +52,12 @@
               <th>
                 Player
               </th>
-              <tr>
-                0
-              </tr>
               <th>
                 Opponent
               </th>
               <tr>
-                0
+              </tr>
+              <tr>
               </tr>
 
             </table>
