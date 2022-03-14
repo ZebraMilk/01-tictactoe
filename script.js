@@ -1,23 +1,21 @@
 const playerFactory = (name, token) => {
 
-  const playerName = name;
-  const playerToken = token;
   // This stores the id values of the places on the board where this player has moved
   const playerMoves = [];
   return {
-    playerName,
-    playerToken,
+    name,
+    token,
     playerMoves
   };
   // Do I need any functions here? What do I want the player to be able to do?
 };
 
 const grabDOM = ((doc) => {
-  "use strict"
+  "use strict";
   // Isolate all the DOM grabbing (except input fields)
   const board = doc.querySelector(".game-board");
   const newGameBtn = doc.querySelector(".new-game");
-// Grabs the user option fields and stores those valuables as variables
+  // Grabs the user option fields and stores those valuables as variables
   const playerTokenChoice = doc.getElementById("player-token-choice");
   const player1Name = doc.getElementById("player1-name");
 
@@ -106,28 +104,23 @@ const gameFlow = (() => {
   // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
   let playerTurn;
   let activeGame = false;
-  
-  const makePlayers = () => {
+  let player1;
+  let player2;
+  const _makePlayers = () => {
     // Make player1 with the user choice, player2 with the other choice
-    const player1 = playerFactory(`${grabDOM.player1Name}`, `${grabDOM.playerTokenChoice.value}`);
+    const player1 = playerFactory(`${grabDOM.player1Name.value}`, `${grabDOM.playerTokenChoice.value}`);
     const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value === "X" ? "O" : "X"));
     const players = [player1, player2];
     return players;
-  }
+  };
   // new game
   const newGame = () => {
-      activeGame = true;
-      playerTurn = (player1.playerToken === "X" ? true : false);
-      return players;
-      };
-    // Return the player whose turn is first
-
-    return {
-      makePlayers,
-      player1: players[0],
-      player2: players[1]
-    };
-  })();
+    let players = _makePlayers();
+    player1 = players[0];
+    player2 = players[1];
+    activeGame = true;
+    playerTurn = (player1.token === "X" ? true : false);
+  };
   // turn change function
   const changeTurn = () => playerTurn = !playerTurn;
   // check game state for tie/win
@@ -135,14 +128,13 @@ const gameFlow = (() => {
   return {
     newGame,
     changeTurn,
-    player1: newGame.player1,
-    player2: newGame.player2,
+    player1,
+    player2,
     playerTurn,
     activeGame
   };
-
-
 })();
+
 
 const computerAI = ((computerPlayer) => {
   // TODO: write a basic AI that picks a random empty suare to move
@@ -151,7 +143,7 @@ const computerAI = ((computerPlayer) => {
     while (gameBoard.isOccupied(random)) {
       random = (random + 1) % 9;
     }
-    gameBoard.updateBoard(random, computerPlayer.playerToken);
+    gameBoard.updateBoard(random, computerPlayer.token);
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
 
@@ -172,13 +164,13 @@ const listenerHandler = (() => {
     e.preventDefault();
     // Clear the board and set up a new one
     displayController.newGrid();
-    gameFlow.newGame.makePlayers();
+    gameFlow.newGame();
   });
 
   grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
-    gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken));
-    e.target.innerText = (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken);
+    gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token));
+    e.target.innerText = (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token);
     gameFlow.changeTurn();
     computerAI.computerMove();
   });
@@ -189,5 +181,5 @@ const listenerHandler = (() => {
 
 })();
 
-
 displayController.newGrid();
+gameFlow.newGame();
