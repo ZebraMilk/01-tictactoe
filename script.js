@@ -104,25 +104,28 @@ const checkState = (() => {
 const gameFlow = (() => {
   "use strict";
   // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
-  let playerTurn = true;
+  let playerTurn;
   let activeGame = false;
-  // new game
-  const newGame = (() => {
-    const startGame = () => {
-    // Clear the board and set up a new one
-    displayController.newGrid();
+  
+  const makePlayers = () => {
     // Make player1 with the user choice, player2 with the other choice
     const player1 = playerFactory(`${grabDOM.player1Name}`, `${grabDOM.playerTokenChoice.value}`);
     const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value === "X" ? "O" : "X"));
-
-    activeGame = true;
+    const players = [player1, player2];
+    return players;
+  }
+  // new game
+  const newGame = () => {
+      activeGame = true;
+      playerTurn = (player1.playerToken === "X" ? true : false);
+      return players;
+      };
     // Return the player whose turn is first
-    playerTurn = (player1.playerToken === "X" ? true : false);
-    };
-    
+
     return {
-      player1,
-      player2
+      makePlayers,
+      player1: players[0],
+      player2: players[1]
     };
   })();
   // turn change function
@@ -167,7 +170,9 @@ const listenerHandler = (() => {
 
   grabDOM.newGameBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    gameFlow.newGame();
+    // Clear the board and set up a new one
+    displayController.newGrid();
+    gameFlow.newGame.makePlayers();
   });
 
   grabDOM.board.addEventListener("click", (e) => {
@@ -175,6 +180,7 @@ const listenerHandler = (() => {
     gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken));
     e.target.innerText = (gameFlow.playerTurn ? gameFlow.player1.playerToken : gameFlow.player2.playerToken);
     gameFlow.changeTurn();
+    computerAI.computerMove();
   });
 
   return {
