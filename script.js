@@ -62,6 +62,8 @@ const displayController = ((doc) => {
   // grid stuff
   const board = grabDOM.board;
 
+
+
   const _clearGrid = () => {
     while (board.lastElementChild) {
       board.removeChild(board.lastElementChild);
@@ -83,8 +85,14 @@ const displayController = ((doc) => {
     gameBoard.resetBoardArray();
   };
 
+  const updateSquare = (index, value) => {
+    const target = doc.getElementById(`${index}`);
+    target.innerText = `${value}`;
+  }
+  
   return {
-    newGrid
+    newGrid,
+    updateSquare
   };
 
 })(document);
@@ -106,6 +114,7 @@ const gameFlow = (() => {
   let activeGame = false;
   let player1;
   let player2;
+
   const _makePlayers = () => {
     // Make player1 with the user choice, player2 with the other choice
     const player1 = playerFactory(`${grabDOM.player1Name.value}`, `${grabDOM.playerTokenChoice.value}`);
@@ -113,13 +122,14 @@ const gameFlow = (() => {
     const players = [player1, player2];
     return players;
   };
+
   // new game
   const newGame = () => {
     let players = _makePlayers();
-    player1 = players[0];
-    player2 = players[1];
-    activeGame = true;
-    playerTurn = (player1.token === "X" ? true : false);
+    gameFlow.player1 = players[0];
+    gameFlow.player2 = players[1];
+    gameFlow.activeGame = true;
+    gameFlow.playerTurn = (gameFlow.player1.token === "X" ? true : false);
   };
   // turn change function
   const changeTurn = () => playerTurn = !playerTurn;
@@ -136,14 +146,15 @@ const gameFlow = (() => {
 })();
 
 
-const computerAI = ((computerPlayer) => {
+const computerAI = (() => {
   // TODO: write a basic AI that picks a random empty suare to move
   const computerMove = () => {
     let random = (Math.floor(Math.random * 10000) % 9);
     while (gameBoard.isOccupied(random)) {
       random = (random + 1) % 9;
     }
-    gameBoard.updateBoard(random, computerPlayer.token);
+    gameBoard.updateBoard(random, gameFlow.player2.token);
+    displayController.updateSquare(random, gameFlow.player2.token)
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
 
@@ -154,10 +165,9 @@ const computerAI = ((computerPlayer) => {
   return {
     computerMove
   };
-})(gameFlow.newGame.player2);
+})();
 
 const listenerHandler = (() => {
-  "use strict";
   // TODO: move all the listeners here.
 
   grabDOM.newGameBtn.addEventListener("click", (e) => {
@@ -170,7 +180,7 @@ const listenerHandler = (() => {
   grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
     gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token));
-    e.target.innerText = (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token);
+    displayController.updateSquare(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token));
     gameFlow.changeTurn();
     computerAI.computerMove();
   });
