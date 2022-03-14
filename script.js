@@ -86,7 +86,7 @@ const displayController = ((doc) => {
   };
 
   const updateSquare = (index, value) => {
-    const target = doc.getElementById(`${index}`);
+    const target = doc.getElementById(index);
     target.innerText = `${value}`;
   }
   
@@ -125,7 +125,7 @@ const gameFlow = (() => {
 
   // new game
   const newGame = () => {
-    let players = _makePlayers();
+    const players = _makePlayers();
     gameFlow.player1 = players[0];
     gameFlow.player2 = players[1];
     gameFlow.activeGame = true;
@@ -149,12 +149,13 @@ const gameFlow = (() => {
 const computerAI = (() => {
   // TODO: write a basic AI that picks a random empty suare to move
   const computerMove = () => {
-    let random = (Math.floor(Math.random * 10000) % 9);
+    let random = (Math.floor(Math.random() * 10000) % 9);
     while (gameBoard.isOccupied(random)) {
       random = (random + 1) % 9;
     }
     gameBoard.updateBoard(random, gameFlow.player2.token);
-    displayController.updateSquare(random, gameFlow.player2.token)
+    displayController.updateSquare(random, gameFlow.player2.token);
+    gameFlow.changeTurn();
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
 
