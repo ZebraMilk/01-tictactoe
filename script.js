@@ -44,12 +44,24 @@ const gameBoard = (() => {
   // checks the board array to see if the square is occupied, returns boolean
   const isOccupied = (index) => _boardArray[index] ? true : false;
 
+  // There is a better way to do this with .reduce() but I will do that later
+  const isFull = () => {
+    let result = true;
+    for (let i = 0; i < 9; i++) {
+      if (_boardArray[i] === null) {
+        result = false;
+      };
+    };
+    return result;
+  };
+
   const logBoard = () => console.log(_boardArray);
 
   return {
     resetBoardArray,
     updateBoard,
     isOccupied,
+    isFull,
     logBoard
   };
 
@@ -89,6 +101,7 @@ const displayController = ((doc) => {
     const target = doc.getElementById(index);
     target.innerText = `${value}`;
   }
+
   
   return {
     newGrid,
@@ -118,7 +131,7 @@ const gameFlow = (() => {
   const _makePlayers = () => {
     // Make player1 with the user choice, player2 with the other choice
     const player1 = playerFactory(`${grabDOM.player1Name.value}`, `${grabDOM.playerTokenChoice.value}`);
-    const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value === "X" ? "O" : "X"));
+    const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
     const players = [player1, player2];
     return players;
   };
@@ -150,9 +163,13 @@ const computerAI = (() => {
   // TODO: write a basic AI that picks a random empty suare to move
   const computerMove = () => {
     let random = (Math.floor(Math.random() * 10000) % 9);
-    while (gameBoard.isOccupied(random)) {
-      random = (random + 1) % 9;
-    }
+    for (let i = 0; i < 9; i++) {
+      if (!gameBoard.isOccupied(random)) {
+        continue;
+      };
+      random = (random + 1) % 9
+    };
+    
     gameBoard.updateBoard(random, gameFlow.player2.token);
     displayController.updateSquare(random, gameFlow.player2.token);
     gameFlow.changeTurn();
