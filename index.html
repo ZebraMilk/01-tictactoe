@@ -26,27 +26,47 @@
           <fieldset>
             <legend>Game Options</legend>
             <div class="options">
-              <label for="player1-name">
-                Player 1 Name:
-                <input type="text" name="player1-name" id="player1-name">
-              </label>
-              <label for="token">Player Choice</label>
+              <label for="token">Token Choice</label>
               <select name="token" id="player-token-choice">
                 <option value="X" class="X">X</option>
                 <option value="O" class="O">O</option>
               </select>
-              <div class="opponent-type">
-  
+              <div class="player-types">
+                
                 <fieldset>
-                  <legend>Opponent Type</legend>
-                  <label for="human">
-                    Human
-                    <input type="radio" name="opponent" id="human" class="human" checked>
+                  <legend>Player One</legend>
+                  <label for="player-one-name">
+                    Player One Name:
+                    <input type="text" name="player-one-name" id="player-one-name">
                   </label>
-                  <label for="computer">
-                    Computer
-                    <input type="radio" name="opponent" id="computer" class="computer">
+                  <div id="player-one-type">
+                    <label for="human">
+                      Human
+                      <input type="radio" name="player-one" id="human1" class="human" checked>
+                    </label>
+                    <label for="computer">
+                      Computer
+                      <input type="radio" name="player-one" id="computer1" class="computer">
+                    </label>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend>Player Two</legend>
+                  <label for="player-two-name">
+                    Player Two Name:
+                    <input type="text" name="player-two-name" id="player-two-name">
                   </label>
+    
+                  <div id="player-two-type">
+                    <label for="human">
+                      Human
+                      <input type="radio" name="player-two" id="human2" class="human" checked>
+                    </label>
+                    <label for="computer">
+                      Computer
+                      <input type="radio" name="player-two" id="computer2" class="computer">
+                    </label>
+                  </div>
                 </fieldset>
               </div>
             </div>

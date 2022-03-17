@@ -21,13 +21,20 @@ const grabDOM = ((doc) => {
   const newGameBtn = doc.querySelector(".new-game");
   // Grabs the user option fields and stores those valuables as variables
   const playerTokenChoice = doc.getElementById("player-token-choice");
-  const player1Name = doc.getElementById("player1-name");
+  const playerOneName = doc.getElementById("player-one-name");
+
+  const playerOneType = doc.getElementById("player-one-type");
+
+  const userOptions = {
+    
+  }
 
   return {
     board,
     newGameBtn,
     playerTokenChoice,
-    player1Name
+    playerOneName,
+
 
   };
 
@@ -139,15 +146,37 @@ const checkState = (() => {
     return isWinner;
   }, false);
 
+  const checkForWinner = (playerOne, playerTwo) => {
+    const playerOneWins = checkWin(playerOne);
+    const playerTwoWins = checkWin(playerTwo);
+    if (playerOneWins) {
+      alert("Player One Wins!")
+      gameFlow.activeGame = false;
+      return playerOne;
+
+    }
+    if (playerTwoWins) {
+      alert("Player Two Wins!")
+      gameFlow.activeGame = false;
+      return playerTwo;
+
+    }
+    else return false;
+  }
+
   const checkTie = () => {
-    if (gameBoard.isFull() && !checkWin(gameFlow.player1) && !checkWin(gameBoard.player2)) {
+    if (gameBoard.isFull() && !checkForWinner(gameFlow.playerOne, gameBoard.playerTwo)) {
+      alert("Cat's game!");
+      gameFlow.activeGame = false;
       return true;
     }
+    return false;
   }
   
   return {
     checkWin,
-    checkTie
+    checkTie,
+    checkForWinner
   };
 })();
 
@@ -155,38 +184,38 @@ const checkState = (() => {
 const gameFlow = (() => {
   "use strict";
   // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
-  let userTurn;
+  let playerOneTurn;
   let activeGame = false;
-  let player1;
-  let player2;
+  let playerOne;
+  let playerTwo;
 
   const _makePlayers = () => {
-    // Make player1 with the user choice, player2 with the other choice
-    const player1 = playerFactory(`${grabDOM.player1Name.value}`, `${grabDOM.playerTokenChoice.value}`);
-    const player2 = playerFactory("player2", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
-    const players = [player1, player2];
+    // Make playerOne with the user choice, playerTwo with the other choice
+    const playerOne = playerFactory(`${grabDOM.playerOneName.value}`, `${grabDOM.playerTokenChoice.value}`);
+    const playerTwo = playerFactory("playerTwo", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
+    const players = [playerOne, playerTwo];
     return players;
   };
 
   // new game
   const newGame = () => {
     const players = _makePlayers();
-    gameFlow.player1 = players[0];
-    gameFlow.player2 = players[1];
+    gameFlow.playerOne = players[0];
+    gameFlow.playerTwo = players[1];
     gameFlow.activeGame = true;
-    gameFlow.userTurn = (gameFlow.player1.token === "X" ? true : false);
+    gameFlow.playerOneTurn = (gameFlow.playerOne.token === "X" ? true : false);
   };
   // turn change function
-  const changeTurn = () => userTurn = !userTurn;
+  const changeTurn = () => playerOneTurn = !playerOneTurn;
 
-  const getCurrentPlayer = () => gameFlow.userTurn ? gameFlow.player1 : gameFlow.player2;
+  const getCurrentPlayer = () => gameFlow.playerOneTurn ? gameFlow.playerOne : gameFlow.playerTwo;
 
   return {
     newGame,
     changeTurn,
-    player1,
-    player2,
-    userTurn,
+    playerOne,
+    playerTwo,
+    playerOneTurn,
     activeGame,
     getCurrentPlayer
   };
@@ -194,19 +223,23 @@ const gameFlow = (() => {
 
 
 const computerAI = (() => {
-
   // TODO: write a basic AI that picks a random empty suare to move
   const randomMove = () => {
-    let random = (Math.floor(Math.random() * 10000) % 9);
-    for (let i = 0; i < 9; i++) {
-      if (!gameBoard.isOccupied(random)) {
-        continue;
+    let computer = gameFlow.getCurrentPlayer();
+    if (!gameBoard.isFull()) {
+      let random = (Math.floor(Math.random() * 10000) % 9);
+      for (let i = 0; i < 9; i++) {
+        if (!gameBoard.isOccupied(random)) {
+          continue;
+        };
+        random = (random + 1) % 9;
       };
-      random = (random + 1) % 9;
-    };
 
-    gameBoard.updateBoard(random, gameFlow.player2.token);
-    displayController.updateSquare(random, gameFlow.player2.token);
+      gameBoard.updateBoard(random, computer.token);
+      displayController.updateSquare(random, computer.token);
+      computer.moves.push(random);
+    }
+    checkState.checkWin(computer);
     gameFlow.changeTurn();
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
@@ -221,16 +254,17 @@ const computerAI = (() => {
 })();
 
 const listenerHandler = (() => {
+  "use strict"
   // user move
   const userMove = (e) => {
-    currentPlayer = gameFlow.getCurrentPlayer();
+    let currentPlayer = gameFlow.getCurrentPlayer();
     gameBoard.updateBoard(e.target.id, currentPlayer.token);
     displayController.updateSquare(e.target.id, currentPlayer.token);
     currentPlayer.moves.push(Number(e.target.id));
-
   }
 
   // TODO: move all the listeners here.
+  // TODO only add listener once newGame
 
   grabDOM.newGameBtn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -239,7 +273,7 @@ const listenerHandler = (() => {
     gameFlow.newGame();
   });
 
-  grabDOM.board.addEventListener("click", (e) => {
+    grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
     if (!gameBoard.isFull()) {
       userMove(e);
@@ -255,6 +289,3 @@ const listenerHandler = (() => {
   };
 
 })();
-
-displayController.newGrid();
-gameFlow.newGame();
