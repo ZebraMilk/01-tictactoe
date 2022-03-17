@@ -1,11 +1,14 @@
 const playerFactory = (name, token) => {
 
   // This stores the id values of the places on the board where this player has moved
-  const playerMoves = [];
+  const moves = [];
+
+
+
   return {
     name,
     token,
-    playerMoves
+    moves
   };
   // Do I need any functions here? What do I want the player to be able to do?
 };
@@ -14,6 +17,7 @@ const grabDOM = ((doc) => {
   "use strict";
   // Isolate all the DOM grabbing (except input fields)
   const board = doc.querySelector(".game-board");
+  board.preventDefault;
   const newGameBtn = doc.querySelector(".new-game");
   // Grabs the user option fields and stores those valuables as variables
   const playerTokenChoice = doc.getElementById("player-token-choice");
@@ -55,6 +59,13 @@ const gameBoard = (() => {
     return result;
   };
 
+
+
+  const getMoves = (player) => {
+    return _boardArray.filter(() => player.token);
+  };
+
+
   const logBoard = () => console.log(_boardArray);
 
   return {
@@ -62,7 +73,8 @@ const gameBoard = (() => {
     updateBoard,
     isOccupied,
     isFull,
-    logBoard
+    logBoard,
+    getMoves
   };
 
 })();
@@ -73,8 +85,6 @@ const displayController = ((doc) => {
   "use strict";
   // grid stuff
   const board = grabDOM.board;
-
-
 
   const _clearGrid = () => {
     while (board.lastElementChild) {
@@ -100,9 +110,9 @@ const displayController = ((doc) => {
   const updateSquare = (index, value) => {
     const target = doc.getElementById(index);
     target.innerText = `${value}`;
-  }
+  };
 
-  
+
   return {
     newGrid,
     updateSquare
@@ -110,12 +120,34 @@ const displayController = ((doc) => {
 
 })(document);
 
-// TODO:: maybe put this inside of the gameBoard module so it has access to the private _boardArray?
 const checkState = (() => {
+  // initialize arrays of win states and check the players for those states
+  const _winStates = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 9],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
 
+  // Compare player moves against the win arrays
+  const checkWin = (player) => _winStates.reduce((isWinner, winState) => {
+    winState.every(move => player.moves.includes(move)) ? (isWinner = true) : false;
+    return isWinner;
+  }, false);
 
+  const checkTie = () => {
+    if (gameBoard.isFull() && !checkWin(gameFlow.player1) && !checkWin(gameBoard.player2)) {
+      return true;
+    }
+  }
+  
   return {
-
+    checkWin,
+    checkTie
   };
 })();
 
@@ -123,7 +155,7 @@ const checkState = (() => {
 const gameFlow = (() => {
   "use strict";
   // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
-  let playerTurn;
+  let userTurn;
   let activeGame = false;
   let player1;
   let player2;
@@ -142,34 +174,37 @@ const gameFlow = (() => {
     gameFlow.player1 = players[0];
     gameFlow.player2 = players[1];
     gameFlow.activeGame = true;
-    gameFlow.playerTurn = (gameFlow.player1.token === "X" ? true : false);
+    gameFlow.userTurn = (gameFlow.player1.token === "X" ? true : false);
   };
   // turn change function
-  const changeTurn = () => playerTurn = !playerTurn;
-  // check game state for tie/win
+  const changeTurn = () => userTurn = !userTurn;
+
+  const getCurrentPlayer = () => gameFlow.userTurn ? gameFlow.player1 : gameFlow.player2;
 
   return {
     newGame,
     changeTurn,
     player1,
     player2,
-    playerTurn,
-    activeGame
+    userTurn,
+    activeGame,
+    getCurrentPlayer
   };
 })();
 
 
 const computerAI = (() => {
+
   // TODO: write a basic AI that picks a random empty suare to move
-  const computerMove = () => {
+  const randomMove = () => {
     let random = (Math.floor(Math.random() * 10000) % 9);
     for (let i = 0; i < 9; i++) {
       if (!gameBoard.isOccupied(random)) {
         continue;
       };
-      random = (random + 1) % 9
+      random = (random + 1) % 9;
     };
-    
+
     gameBoard.updateBoard(random, gameFlow.player2.token);
     displayController.updateSquare(random, gameFlow.player2.token);
     gameFlow.changeTurn();
@@ -181,11 +216,20 @@ const computerAI = (() => {
   // TODO: write an unbeatable AI
 
   return {
-    computerMove
+    randomMove
   };
 })();
 
 const listenerHandler = (() => {
+  // user move
+  const userMove = (e) => {
+    currentPlayer = gameFlow.getCurrentPlayer();
+    gameBoard.updateBoard(e.target.id, currentPlayer.token);
+    displayController.updateSquare(e.target.id, currentPlayer.token);
+    currentPlayer.moves.push(Number(e.target.id));
+
+  }
+
   // TODO: move all the listeners here.
 
   grabDOM.newGameBtn.addEventListener("click", (e) => {
@@ -197,10 +241,13 @@ const listenerHandler = (() => {
 
   grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
-    gameBoard.updateBoard(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token));
-    displayController.updateSquare(e.target.id, (gameFlow.playerTurn ? gameFlow.player1.token : gameFlow.player2.token));
-    gameFlow.changeTurn();
-    computerAI.computerMove();
+    if (!gameBoard.isFull()) {
+      userMove(e);
+      checkState.checkWin(gameFlow.getCurrentPlayer());
+      gameFlow.changeTurn();
+        // This is just for now, will gate this behind a check for opponent type
+      computerAI.randomMove();
+    };
   });
 
   return {
