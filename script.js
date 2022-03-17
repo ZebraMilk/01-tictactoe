@@ -1,7 +1,7 @@
 const playerFactory = (name, token) => {
 
   // This stores the id values of the places on the board where this player has moved
-  const moves = [];
+  let moves = [];
 
 
 
@@ -22,12 +22,13 @@ const grabDOM = ((doc) => {
   // Grabs the user option fields and stores those valuables as variables
   const playerTokenChoice = doc.getElementById("player-token-choice");
   const playerOneName = doc.getElementById("player-one-name");
+  const playerOneType = doc.querySelector("input[name='player-one-type']:checked");
 
-  const playerOneType = doc.getElementById("player-one-type");
-
-  const userOptions = {
+  // const playerTwoName = doc.getElementById("player-two-name").value;
+  // const playerTwoType = doc.querySelector("input[name='player-two-type']:checked").value;
+  // const userOptions = {
     
-  }
+  // }
 
   return {
     board,
@@ -68,9 +69,7 @@ const gameBoard = (() => {
 
 
 
-  const getMoves = (player) => {
-    return _boardArray.filter(() => player.token);
-  };
+
 
 
   const logBoard = () => console.log(_boardArray);
@@ -80,8 +79,7 @@ const gameBoard = (() => {
     updateBoard,
     isOccupied,
     isFull,
-    logBoard,
-    getMoves
+    logBoard
   };
 
 })();
@@ -127,6 +125,48 @@ const displayController = ((doc) => {
 
 })(document);
 
+
+const gameFlow = (() => {
+  "use strict";
+  // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
+  let playerOneTurn = true;
+  let activeGame = false;
+  let playerOne;
+  let playerTwo;
+
+  const _makePlayers = () => {
+    // Make playerOne with the user choice, playerTwo with the other choice
+    const playerOne = playerFactory(`${grabDOM.playerOneName.value}`, `${grabDOM.playerTokenChoice.value}`);
+    const playerTwo = playerFactory("playerTwo", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
+    const players = [playerOne, playerTwo];
+    return players;
+  };
+
+  // new game
+  const newGame = () => {
+    const players = _makePlayers();
+    playerOne = players[0];
+    playerTwo = players[1];
+    activeGame = true;
+    playerOneTurn = (playerOne.token === "X" ? true : false);
+  };
+  // turn change function
+  const changeTurn = () => playerOneTurn = !playerOneTurn;
+
+  const getCurrentPlayer = () => playerOneTurn ? playerOne : playerTwo;
+
+  return {
+    newGame,
+    changeTurn,
+    playerOne,
+    playerTwo,
+    playerOneTurn,
+    activeGame,
+    getCurrentPlayer
+  };
+})();
+
+
 const checkState = (() => {
   // initialize arrays of win states and check the players for those states
   const _winStates = [
@@ -140,25 +180,29 @@ const checkState = (() => {
     [2, 4, 6]
   ];
 
+  let winner;
+
   // Compare player moves against the win arrays
   const checkWin = (player) => _winStates.reduce((isWinner, winState) => {
     winState.every(move => player.moves.includes(move)) ? (isWinner = true) : false;
     return isWinner;
   }, false);
 
-  const checkForWinner = (playerOne, playerTwo) => {
-    const playerOneWins = checkWin(playerOne);
-    const playerTwoWins = checkWin(playerTwo);
+  const checkForWinner = () => {
+    let playerOneWins = checkWin(gameFlow.playerOne);
+    let playerTwoWins = checkWin(gameFlow.playerTwo);
     if (playerOneWins) {
       alert("Player One Wins!")
       gameFlow.activeGame = false;
-      return playerOne;
+      checkState.winner = "playerTwo";
+      return true;
 
     }
     if (playerTwoWins) {
       alert("Player Two Wins!")
       gameFlow.activeGame = false;
-      return playerTwo;
+      checkState.winner = "playerTwo";
+      return true;
 
     }
     else return false;
@@ -176,48 +220,8 @@ const checkState = (() => {
   return {
     checkWin,
     checkTie,
-    checkForWinner
-  };
-})();
-
-
-const gameFlow = (() => {
-  "use strict";
-  // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
-  let playerOneTurn;
-  let activeGame = false;
-  let playerOne;
-  let playerTwo;
-
-  const _makePlayers = () => {
-    // Make playerOne with the user choice, playerTwo with the other choice
-    const playerOne = playerFactory(`${grabDOM.playerOneName.value}`, `${grabDOM.playerTokenChoice.value}`);
-    const playerTwo = playerFactory("playerTwo", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
-    const players = [playerOne, playerTwo];
-    return players;
-  };
-
-  // new game
-  const newGame = () => {
-    const players = _makePlayers();
-    gameFlow.playerOne = players[0];
-    gameFlow.playerTwo = players[1];
-    gameFlow.activeGame = true;
-    gameFlow.playerOneTurn = (gameFlow.playerOne.token === "X" ? true : false);
-  };
-  // turn change function
-  const changeTurn = () => playerOneTurn = !playerOneTurn;
-
-  const getCurrentPlayer = () => gameFlow.playerOneTurn ? gameFlow.playerOne : gameFlow.playerTwo;
-
-  return {
-    newGame,
-    changeTurn,
-    playerOne,
-    playerTwo,
-    playerOneTurn,
-    activeGame,
-    getCurrentPlayer
+    checkForWinner,
+    winner
   };
 })();
 
@@ -239,7 +243,7 @@ const computerAI = (() => {
       displayController.updateSquare(random, computer.token);
       computer.moves.push(random);
     }
-    checkState.checkWin(computer);
+    checkState.checkForWinner();
     gameFlow.changeTurn();
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
@@ -263,8 +267,8 @@ const listenerHandler = (() => {
     currentPlayer.moves.push(Number(e.target.id));
   }
 
-  // TODO: move all the listeners here.
-  // TODO only add listener once newGame
+
+  // TODO only add listener once newGame?
 
   grabDOM.newGameBtn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -277,7 +281,7 @@ const listenerHandler = (() => {
     e.stopPropagation();
     if (!gameBoard.isFull()) {
       userMove(e);
-      checkState.checkWin(gameFlow.getCurrentPlayer());
+      checkState.checkForWinner();
       gameFlow.changeTurn();
         // This is just for now, will gate this behind a check for opponent type
       computerAI.randomMove();
