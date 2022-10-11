@@ -1,20 +1,6 @@
-const playerFactory = (name, token) => {
-
-  // This stores the id values of the places on the board where this player has moved
-  let moves = [];
-
-
-
-  return {
-    name,
-    token,
-    moves
-  };
-  // Do I need any functions here? What do I want the player to be able to do?
-};
 
 const grabDOM = ((doc) => {
-  "use strict";
+  
   // Isolate all the DOM grabbing (except input fields)
   const board = doc.querySelector(".game-board");
   board.preventDefault;
@@ -22,12 +8,12 @@ const grabDOM = ((doc) => {
   // Grabs the user option fields and stores those valuables as variables
   const playerTokenChoice = doc.getElementById("player-token-choice");
   const playerOneName = doc.getElementById("player-one-name");
-  const playerOneType = doc.querySelector("input[name='player-one-type']:checked");
+  // const playerOneType = doc.querySelector("input[name='player-one-type']:checked");
 
-  // const playerTwoName = doc.getElementById("player-two-name").value;
+  const playerTwoName = doc.getElementById("player-two-name");
   // const playerTwoType = doc.querySelector("input[name='player-two-type']:checked").value;
   // const userOptions = {
-    
+
   // }
 
   return {
@@ -35,6 +21,7 @@ const grabDOM = ((doc) => {
     newGameBtn,
     playerTokenChoice,
     playerOneName,
+    playerTwoName
 
 
   };
@@ -44,7 +31,7 @@ const grabDOM = ((doc) => {
 
 // This is the internal gameBoard, 
 const gameBoard = (() => {
-  "use strict";
+  
   // Private array
   let _boardArray = [null, null, null, null, null, null, null, null, null];
 
@@ -56,7 +43,7 @@ const gameBoard = (() => {
   // checks the board array to see if the square is occupied, returns boolean
   const isOccupied = (index) => _boardArray[index] ? true : false;
 
-  // There is a better way to do this with .reduce() but I will do that later
+  // There is a better way to do this with .reduce() 
   const isFull = () => {
     let result = true;
     for (let i = 0; i < 9; i++) {
@@ -87,7 +74,7 @@ const gameBoard = (() => {
 
 // This grabs game DOM elements and does stuff to them
 const displayController = ((doc) => {
-  "use strict";
+  
   // grid stuff
   const board = grabDOM.board;
 
@@ -125,35 +112,38 @@ const displayController = ((doc) => {
 
 })(document);
 
-
+// Hold the player information and turn
 const gameFlow = (() => {
-  "use strict";
+
+  const _playerFactory = (name, token) => {
+    // This stores the id values of the places on the board where this player has moved
+    let moves = [];
+
+    return {
+      name,
+      token,
+      moves
+    };
+  };
+
   // Here goes things like turn tracking, checking for win/tie (maybe separate that logic?)
   let playerOneTurn = true;
   let activeGame = false;
   let playerOne;
   let playerTwo;
 
-  const _makePlayers = () => {
-    // Make playerOne with the user choice, playerTwo with the other choice
-    const playerOne = playerFactory(`${grabDOM.playerOneName.value}`, `${grabDOM.playerTokenChoice.value}`);
-    const playerTwo = playerFactory("playerTwo", (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
-    const players = [playerOne, playerTwo];
-    return players;
-  };
-
   // new game
   const newGame = () => {
-    const players = _makePlayers();
-    playerOne = players[0];
-    playerTwo = players[1];
-    activeGame = true;
-    playerOneTurn = (playerOne.token === "X" ? true : false);
+    gameFlow.playerOne = _playerFactory(`${grabDOM.playerOneName.value}`, `${grabDOM.playerTokenChoice.value}`);
+    gameFlow.playerTwo = _playerFactory(`${grabDOM.playerTwoName.value}`, (grabDOM.playerTokenChoice.value == "X" ? "O" : "X"));
+    gameFlow.activeGame = true;
+    gameFlow.playerOneTurn = (gameFlow.playerOne.token === "X" ? true : false);
   };
   // turn change function
-  const changeTurn = () => playerOneTurn = !playerOneTurn;
+  const changeTurn = () => gameFlow.playerOneTurn = !gameFlow.playerOneTurn;
+    
 
-  const getCurrentPlayer = () => playerOneTurn ? playerOne : playerTwo;
+  const getCurrentPlayer = () => gameFlow.playerOneTurn ? gameFlow.playerOne : gameFlow.playerTwo;
 
   return {
     newGame,
@@ -166,7 +156,7 @@ const gameFlow = (() => {
   };
 })();
 
-
+// Check for win or tie
 const checkState = (() => {
   // initialize arrays of win states and check the players for those states
   const _winStates = [
@@ -183,42 +173,41 @@ const checkState = (() => {
   let winner;
 
   // Compare player moves against the win arrays
-  const checkWin = (player) => _winStates.reduce((isWinner, winState) => {
+  const _checkWin = (player) => _winStates.reduce((isWinner, winState) => {
     winState.every(move => player.moves.includes(move)) ? (isWinner = true) : false;
     return isWinner;
   }, false);
 
   const checkForWinner = () => {
-    let playerOneWins = checkWin(gameFlow.playerOne);
-    let playerTwoWins = checkWin(gameFlow.playerTwo);
+    let playerOneWins = _checkWin(gameFlow.playerOne);
+    let playerTwoWins = _checkWin(gameFlow.playerTwo);
     if (playerOneWins) {
-      alert("Player One Wins!")
+      alert("Player One Wins!");
       gameFlow.activeGame = false;
-      checkState.winner = "playerTwo";
+      checkState.winner = "playerOne";
       return true;
 
     }
     if (playerTwoWins) {
-      alert("Player Two Wins!")
+      alert("Player Two Wins!");
       gameFlow.activeGame = false;
       checkState.winner = "playerTwo";
       return true;
 
     }
     else return false;
-  }
+  };
 
   const checkTie = () => {
-    if (gameBoard.isFull() && !checkForWinner(gameFlow.playerOne, gameBoard.playerTwo)) {
+    if (gameBoard.isFull() && !checkForWinner()) {
       alert("Cat's game!");
       gameFlow.activeGame = false;
       return true;
     }
     return false;
-  }
-  
+  };
+
   return {
-    checkWin,
     checkTie,
     checkForWinner,
     winner
@@ -243,8 +232,9 @@ const computerAI = (() => {
       displayController.updateSquare(random, computer.token);
       computer.moves.push(random);
     }
-    checkState.checkForWinner();
-    gameFlow.changeTurn();
+    if (!checkState.checkForWinner()) {
+      gameFlow.changeTurn();
+    };
   };
   // TODO: write a less basic AI that favors placing tokens adjacent to already occupied squares
 
@@ -257,35 +247,62 @@ const computerAI = (() => {
   };
 })();
 
-const listenerHandler = (() => {
-  "use strict"
-  // user move
-  const userMove = (e) => {
+const gameEvents = (() => {
+  const currentPlayerMove = (e) => {
     let currentPlayer = gameFlow.getCurrentPlayer();
-    gameBoard.updateBoard(e.target.id, currentPlayer.token);
-    displayController.updateSquare(e.target.id, currentPlayer.token);
-    currentPlayer.moves.push(Number(e.target.id));
+    if (gameBoard.isOccupied(e.target.id)) {
+      alert("This stall is occupied, try again!");
+    } else {
+      gameBoard.updateBoard(e.target.id, currentPlayer.token);
+      displayController.updateSquare(e.target.id, currentPlayer.token);
+      currentPlayer.moves.push(Number(e.target.id));
+    }
+    
+  };
+
+  const newGame = () => {
+    // Clear the board and set up a new one
+    displayController.newGrid();
+    gameFlow.newGame();
+  };
+
+  const updateBoard = (e) => {
+    if (!gameBoard.isFull() && grabDOM.board.lastElementChild) {
+      currentPlayerMove(e);
+      checkState.checkForWinner();
+      gameFlow.changeTurn();
+      // This is just for now, will gate this behind a check for opponent type
+      computerAI.randomMove();
+    };
   }
+
+  
+  return {
+    currentPlayerMove,
+    newGame,
+    updateBoard
+  };
+
+})();
+
+const listenerHandler = (() => {
+  
+  // user move
+  const _userMove = (e) => {
+    gameEvents.currentPlayerMove(e);
+  };
 
 
   // TODO only add listener once newGame?
 
-  grabDOM.newGameBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    // Clear the board and set up a new one
-    displayController.newGrid();
-    gameFlow.newGame();
+  grabDOM.newGameBtn.addEventListener("click", () => {
+    //e.preventDefault();
+    gameEvents.newGame();
   });
 
-    grabDOM.board.addEventListener("click", (e) => {
+  grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (!gameBoard.isFull()) {
-      userMove(e);
-      checkState.checkForWinner();
-      gameFlow.changeTurn();
-        // This is just for now, will gate this behind a check for opponent type
-      computerAI.randomMove();
-    };
+    gameEvents.updateBoard(e);
   });
 
   return {
