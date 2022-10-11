@@ -310,3 +310,6 @@ const listenerHandler = (() => {
   };
 
 })();
+
+
+//Testing new commit editor settings
