@@ -269,10 +269,8 @@ const gameEvents = (() => {
   const updateBoard = (e) => {
     if (!gameBoard.isFull() && grabDOM.board.lastElementChild) {
       currentPlayerMove(e);
-      checkState.checkForWinner();
+      // checkState.checkForWinner();
       gameFlow.changeTurn();
-      // This is just for now, will gate this behind a check for opponent type
-      computerAI.randomMove();
     };
   }
 
