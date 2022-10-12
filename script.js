@@ -285,12 +285,6 @@ const gameEvents = (() => {
 
 const listenerHandler = (() => {
   
-  // user move
-  const _userMove = (e) => {
-    gameEvents.currentPlayerMove(e);
-  };
-
-
   // TODO only add listener once newGame?
 
   grabDOM.newGameBtn.addEventListener("click", () => {
@@ -300,7 +294,8 @@ const listenerHandler = (() => {
 
   grabDOM.board.addEventListener("click", (e) => {
     e.stopPropagation();
-    gameEvents.updateBoard(e);
+    // gameEvents.updateBoard(e);
+    gameEvents.currentPlayerMove(e);
   });
 
   return {
