@@ -182,16 +182,16 @@ const checkState = (() => {
     let playerOneWins = _checkWin(gameFlow.playerOne);
     let playerTwoWins = _checkWin(gameFlow.playerTwo);
     if (playerOneWins) {
-      alert("Player One Wins!");
       gameFlow.activeGame = false;
       checkState.winner = "playerOne";
+      alert("Player One Wins!");
       return true;
 
     }
     if (playerTwoWins) {
-      alert("Player Two Wins!");
       gameFlow.activeGame = false;
       checkState.winner = "playerTwo";
+      alert("Player Two Wins!");
       return true;
 
     }
@@ -250,12 +250,17 @@ const computerAI = (() => {
 const gameEvents = (() => {
   const currentPlayerMove = (e) => {
     let currentPlayer = gameFlow.getCurrentPlayer();
+    console.log(currentPlayer);
     if (gameBoard.isOccupied(e.target.id)) {
       alert("This stall is occupied, try again!");
+    // } else if (currentPlayer == gameFlow.playerTwo) {
+
     } else {
       gameBoard.updateBoard(e.target.id, currentPlayer.token);
       displayController.updateSquare(e.target.id, currentPlayer.token);
       currentPlayer.moves.push(Number(e.target.id));
+      gameFlow.changeTurn();
+      computerAI.randomMove();
     }
     
   };
@@ -270,7 +275,6 @@ const gameEvents = (() => {
     if (!gameBoard.isFull() && grabDOM.board.lastElementChild) {
       currentPlayerMove(e);
       // checkState.checkForWinner();
-      gameFlow.changeTurn();
     };
   }
 
