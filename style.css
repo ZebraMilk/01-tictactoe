@@ -1,71 +1,71 @@
 :root {
-  font-size: 24px;
-  margin: 0;
-  padding: 0;
+    font-size: 24px;
+    margin: 0;
+    padding: 0;
 }
 
 * {
-  border: 1px solid orange;
-  box-sizing: border-box;
+    border: 1px solid orange;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: black;
-  color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
 }
 
 header {
-  width: 100%;
-  text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 .main-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .game-container {
-  display: flex;
-  
+    display: flex;
+
 }
 
 .game-menu {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-content {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-board {
-  display: grid;
-  width: 600px;
-  height: 600px;
-  grid-template: repeat(3, 200px) / repeat(3, 200px);
+    display: grid;
+    width: 600px;
+    height: 600px;
+    grid-template: repeat(3, 200px) / repeat(3, 200px);
 }
 
 .square {
-  background-color: darkred;
-  width: 200px;
-  height: 200px;
-  font-size: 6rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    background-color: darkred;
+    width: 200px;
+    height: 200px;
+    font-size: 6rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .turn-display {
-  text-align: center;
+    text-align: center;
 }
 
 .scoreboard {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }

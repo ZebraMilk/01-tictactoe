@@ -1,108 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
-    <link rel="manifest" href="./favicon/site.webmanifest">
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
-    <script src="./script.js" defer="defer">
+    <head>
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="./favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32"
+            href="./favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16"
+            href="./favicon/favicon-16x16.png">
+        <link rel="manifest" href="./favicon/site.webmanifest">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./style.css">
+        <script src="./script.js" defer="defer">
 
-    </script>
-    <title>tictactoe</title>
-  </head>
+        </script>
+        <title>tictactoe</title>
+    </head>
 
-  <body>
-    <div class="main-content">
-      <header>
-        <h1>tictactoe</h1>
-      
-      </header>
-      <div class="game-container">
-        <div class="game-menu">
-          <fieldset>
-            <legend>Game Options</legend>
-            <div class="options">
-              <label for="token">Token Choice</label>
-              <select name="token" id="player-token-choice">
-                <option value="X" class="X">X</option>
-                <option value="O" class="O">O</option>
-              </select>
-              <div class="player-types">
-                
-                <fieldset>
-                  <legend>Player One</legend>
-                  <label for="player-one-name">
-                    Player One Name:
-                    <input type="text" name="player-one-name" id="player-one-name">
-                  </label>
-                  <div id="player-one-type">
-                    <label for="human">
-                      Human
-                      <input type="radio" name="player-one-type" id="human1" class="human" checked>
-                    </label>
-                    <label for="computer">
-                      Computer
-                      <input type="radio" name="player-one-type" id="computer1" class="computer">
-                    </label>
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <legend>Player Two</legend>
-                  <label for="player-two-name">
-                    Player Two Name:
-                    <input type="text" name="player-two-name" id="player-two-name">
-                  </label>
-    
-                  <div id="player-two-type">
-                    <label for="human">
-                      Human
-                      <input type="radio" name="player-two" id="human2" class="human" checked>
-                    </label>
-                    <label for="computer">
-                      Computer
-                      <input type="radio" name="player-two" id="computer2" class="computer">
-                    </label>
-                  </div>
-                </fieldset>
-              </div>
+    <body>
+        <div class="main-content">
+            <header>
+                <h1>tictactoe</h1>
+
+            </header>
+            <div class="game-container">
+                <div class="game-menu">
+                    <fieldset>
+                        <legend>Game Options</legend>
+                        <div class="options">
+                            <label for="token">Token Choice</label>
+                            <select name="token" id="player-token-choice">
+                                <option value="X" class="X">X</option>
+                                <option value="O" class="O">O</option>
+                            </select>
+                            <div class="player-types">
+
+                                <fieldset>
+                                    <legend>Player One</legend>
+                                    <label for="player-one-name">
+                                        Player One Name:
+                                        <input type="text"
+                                            name="player-one-name"
+                                            id="player-one-name">
+                                    </label>
+                                    <div id="player-one-type">
+                                        <label for="human">
+                                            Human
+                                            <input type="radio"
+                                                name="player-one-type"
+                                                id="human1" class="human"
+                                                checked>
+                                        </label>
+                                        <label for="computer">
+                                            Computer
+                                            <input type="radio"
+                                                name="player-one-type"
+                                                id="computer1" class="computer">
+                                        </label>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <legend>Player Two</legend>
+                                    <label for="player-two-name">
+                                        Player Two Name:
+                                        <input type="text"
+                                            name="player-two-name"
+                                            id="player-two-name">
+                                    </label>
+
+                                    <div id="player-two-type">
+                                        <label for="human">
+                                            Human
+                                            <input type="radio"
+                                                name="player-two" id="human2"
+                                                class="human" checked>
+                                        </label>
+                                        <label for="computer">
+                                            Computer
+                                            <input type="radio"
+                                                name="player-two" id="computer2"
+                                                class="computer">
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="buttons">
+                        <button class="new-game">New Game</button>
+                    </div>
+                </div>
+                <div class="game-content">
+                    <div class="game-board">
+
+                    </div>
+                    <div class="turn-display">
+                        <h2>
+                            Your Turn, lover!
+                        </h2>
+                    </div>
+                    <div class="scoreboard">
+                        <table>
+                            <th>
+                                Player
+                            </th>
+                            <th>
+                                Opponent
+                            </th>
+                            <tr>
+                            </tr>
+                            <tr>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
             </div>
-          </fieldset>
-          <div class="buttons">
-            <button class="new-game">New Game</button>
-          </div>
         </div>
-        <div class="game-content">
-          <div class="game-board">
-      
-          </div>
-          <div class="turn-display">
-            <h2>
-              Your Turn, lover!
-            </h2>
-          </div>
-          <div class="scoreboard">
-            <table>
-              <th>
-                Player
-              </th>
-              <th>
-                Opponent
-              </th>
-              <tr>
-              </tr>
-              <tr>
-              </tr>
 
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-  </body>
+    </body>
 
 </html>
